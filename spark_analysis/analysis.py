@@ -27,7 +27,7 @@ logger.addHandler(handler)
 
 # HBase configuration
 
-client = HBaseRESTClient(['http://localhost:8080'])
+client = HBaseRESTClient(['http://localhost:8000'])
 
 VEH_STATS_PREFIXES = {
     "analysisdate" : "meta",
