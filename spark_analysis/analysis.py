@@ -73,7 +73,7 @@ LINE_RAIN_STATS_PREFIXES = {
     "totaldistline_km": "stats",
     "avgdistline_km": "stats",
     "totaltimeline_h": "stats",
-    "avgtimeline_km": "stats",
+    "avgtimeline_h": "stats",
     "avgspeedline_mps": "stats"
 }
 
