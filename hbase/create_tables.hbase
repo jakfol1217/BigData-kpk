@@ -1,0 +1,4 @@
+create "veh_stats", "meta", "id", "stats"
+create "line_stats", "meta", "id", "stats"
+create "bus_weather_stats", "meta", "id", "stats"
+create "bus_weather_line_stats", "meta", "id", "stats"
