@@ -23,25 +23,6 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 logger.addHandler(handler)
 
-
-
-def load_all_files_in_dir(spark, directory, hadoop_location="hdfs://localhost:8020"):
-    import subprocess
-
-    cmd = ["hdfs", "dfs", "-ls", directory]
-    files = subprocess.check_output(cmd).strip().split(b'\n')
-
-    all_dfs = [
-        spark.read.format("avro").load(f'{hadoop_location}{path.decode().split()[-1]}')
-        for path in files[1:]
-    ]
-
-    combined = all_dfs[0]
-    for df in all_dfs[1:]:
-        combined = combined.union(df)
-    return combined
-
-
 def main(date_to_process):
     spark = (
         SparkSession.builder
@@ -53,10 +34,10 @@ def main(date_to_process):
     spark.sparkContext.setLogLevel("ERROR")
     logger.info("Starting spark application")
 
-    source_path = f"/user/kpk/speeds/{date_to_process}"
+    source_path = f"/user/kpk/speeds/{date_to_process}.avro"
 
     logger.info(f"Load/combine all files from {source_path}")
-    combined = load_all_files_in_dir(spark, source_path)
+    combined = spark.read.format("avro").load(f"hdfs://localhost:8020{source_path}")
 
 #---------------------------------------------------------------------------------------------------
 
