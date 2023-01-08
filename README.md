@@ -6,4 +6,4 @@ Projekt skupia się na przetwarzaniu i analizie danych dotyczących autobusów w
 * `nifi\` - folder ten zawiera szablony przetwarzania w Apache Nifi, jak i wszelkie skrypty "pomocnicze", wspomagające owe przetwarzanie.
 * `enrichment\` - folder ten zawiera skrypty PySpark związane z ubogacaniem danych dotyczących autobusów.
 * `spark_analysis\` - folder zawierający skrypty z dalszymi analizami w PySpark.
-* `hbase\` - folder zawierający skrypty zapisujące analizy do HBase, jak i również umożliwiające dostęp do HBase z poziomu jupyter notebook.
+* `hbase\` - folder zawierający skrypty tworzące bazy danych HBase, jak i również umożliwiające dostęp do HBase z poziomu jupyter notebook.
