@@ -46,9 +46,9 @@ LINE_STATS_PREFIXES = {
     "busdatasource": "meta",
     "date": "id",
     "lines": "id",
-    "totaldist_km": "stats",
-    "totaltime_h": "stats",
-    "avgspeed_mps": "stats"
+    "totaldistline_km": "stats",
+    "totaltimeline_h": "stats",
+    "avgspeedline_mps": "stats"
 }
 
 VEH_WEATHER_STATS_PREFIXES = {
@@ -70,9 +70,9 @@ LINE_RAIN_STATS_PREFIXES = {
     "date": "id",
     "lines": "id",
     "rain": "id",
-    "totaldist_km": "stats",
-    "totaltime_h": "stats",
-    "avgspeed_mps": "stats"
+    "totaldistline_km": "stats",
+    "totaltimeline_h": "stats",
+    "avgspeedline_mps": "stats"
 }
 
 
