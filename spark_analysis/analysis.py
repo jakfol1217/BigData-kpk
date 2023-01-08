@@ -7,6 +7,9 @@ spark-submit \
  20221231
 """
 
+# requires package hbase-rest-py 
+"pip install hbase-rest-py"
+
 import sys
 import logging
 import pyspark
