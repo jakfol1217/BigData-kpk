@@ -61,7 +61,7 @@ def main(date_to_process):
     #joining with weather dataframe
     combined_with_year = spark.sql("SELECT *, MONTH(Time) AS Month_a, DAY(Time) AS Day_a, HOUR(Time) AS Hour_a FROM Combined_sql")
     year = int(str(date_to_process)[:4])
-    weather_path = f"hdfs://localhost:8020/user/kpk/weather/{year}.csv"
+    weather_path = f"hdfs://localhost:8020/user/kpk/weather/{year}/{year}.csv"
     df_weather = spark.read.option("header","true").option("inferschema","true").csv(weather_path)
     df_weather.createOrReplaceTempView("Weather_sql")
     weather_with_day = spark.sql("SELECT *, MONTH(Date) AS Month, DAY(Date) AS Day FROM Weather_sql")
