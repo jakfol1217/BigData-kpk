@@ -160,7 +160,7 @@ def main(date_to_process):
 
     logger.info("Simple statistics")
     combined.createOrReplaceTempView("Combined_sql")
-    veh_stats = spark.sql("SELECT Lines, VehicleNumber, Brigade, SUM(DeltaDist_m)/1000 AS TotalDist_km, SUM(DeltaTime_s)/3600 AS TotalTime_h, AVG(NULLIF(SpeedInstant_mps,0)) AS AvgSpeed_mps FROM Combined_sql GROUP BY Lines, VehicleNumber, Brigade")
+    veh_stats = spark.sql("SELECT Lines, VehicleNumber, Brigade, SUM(DeltaDist_m)/1000 AS TotalDist_km, SUM(DeltaTime_s)/3600 AS TotalTime_h, (SUM(DeltaDist_m)/1000)/(SUM(DeltaTime_s)/3600) AS AvgSpeed_kmph FROM Combined_sql GROUP BY Lines, VehicleNumber, Brigade")
 
     def veh_stats_rowkey(row):
         return "{}_{}_{}_{}".format(
@@ -174,7 +174,7 @@ def main(date_to_process):
     write_df_to_hbase(veh_stats_dict, "veh_stats", veh_stats_rowkey, VEH_STATS_PREFIXES)
 
     veh_stats.createOrReplaceTempView("VehStats_sql")
-    line_stats = spark.sql("SELECT Lines, SUM(TotalDist_km) AS TotalDistLine_km, SUM(TotalTime_h) AS TotalTimeLine_h, AVG(NULLIF(AvgSpeed_mps,0)) AS AvgSpeedLine_mps FROM VehStats_sql GROUP BY Lines")
+    line_stats = spark.sql("SELECT Lines, SUM(TotalDist_km) AS TotalDistLine_km, SUM(TotalTime_h) AS TotalTimeLine_h, AVG(NULLIF(AvgSpeed_kmph,0)) AS AvgSpeedLine_mps FROM VehStats_sql GROUP BY Lines")
 
     def line_stats_rowkey(row):
         return "{}_{}".format(
@@ -204,7 +204,7 @@ def main(date_to_process):
 
     #bus-weather stats
     bus_weather_rain.createOrReplaceTempView("BusWeatherRain_sql")
-    bus_weather_stats = spark.sql("SELECT Lines, VehicleNumber, Brigade, coco, SUM(DeltaDist_m)/1000 AS TotalDist_km, SUM(DeltaTime_s)/3600 AS TotalTime_h, AVG(NULLIF(SpeedInstant_mps,0)) AS AvgSpeed_mps FROM BusWeatherRain_sql GROUP BY Lines, VehicleNumber, Brigade, coco")
+    bus_weather_stats = spark.sql("SELECT Lines, VehicleNumber, Brigade, coco, SUM(DeltaDist_m)/1000 AS TotalDist_km, SUM(DeltaTime_s)/3600 AS TotalTime_h, (SUM(DeltaDist_m)/1000)/(SUM(DeltaTime_s)/3600) AS AvgSpeed_kmph FROM BusWeatherRain_sql GROUP BY Lines, VehicleNumber, Brigade, coco")
 
     logger.info("Saving to HBase...")
 
@@ -222,10 +222,10 @@ def main(date_to_process):
 
     logger.info("Lines written")
 
-    bus_weather_rain_stats = spark.sql("SELECT Lines, VehicleNumber, Brigade, Rain, SUM(DeltaDist_m)/1000 AS TotalDist_km, SUM(DeltaTime_s)/3600 AS TotalTime_h, AVG(NULLIF(SpeedInstant_mps,0)) AS AvgSpeed_mps FROM BusWeatherRain_sql GROUP BY Lines, VehicleNumber, Brigade, Rain")
+    bus_weather_rain_stats = spark.sql("SELECT Lines, VehicleNumber, Brigade, Rain, SUM(DeltaDist_m)/1000 AS TotalDist_km, SUM(DeltaTime_s)/3600 AS TotalTime_h, (SUM(DeltaDist_m)/1000)/(SUM(DeltaTime_s)/3600) AS AvgSpeed_kmph FROM BusWeatherRain_sql GROUP BY Lines, VehicleNumber, Brigade, Rain")
 
     bus_weather_rain_stats.createOrReplaceTempView("BusWeatherStats_sql")
-    bus_weather_line_stats = spark.sql("SELECT Lines, Rain, SUM(TotalDist_km) AS TotalDistLine_km, AVG(TotalDist_km) AS AvgDistLine_km, AVG(TotalTime_h) AS AvgTimeLine_h, AVG(NULLIF(AvgSpeed_mps,0)) AS AvgSpeedLine_mps FROM BusWeatherStats_sql GROUP BY Lines, Rain")
+    bus_weather_line_stats = spark.sql("SELECT Lines, Rain, SUM(TotalDist_km) AS TotalDistLine_km, AVG(TotalDist_km) AS AvgDistLine_km, AVG(TotalTime_h) AS AvgTimeLine_h, AVG(NULLIF(AvgSpeed_kmph,0)) AS AvgSpeedLine_mps FROM BusWeatherStats_sql GROUP BY Lines, Rain")
 
     logger.info("Saving to HBase...")
 
