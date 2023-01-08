@@ -7,3 +7,4 @@ Projekt skupia się na przetwarzaniu i analizie danych dotyczących autobusów w
 * `enrichment\` - folder ten zawiera skrypty PySpark związane z ubogacaniem danych dotyczących autobusów.
 * `spark_analysis\` - folder zawierający skrypty z dalszymi analizami w PySpark.
 * `hbase\` - folder zawierający skrypty tworzące bazy danych HBase, jak i również umożliwiające dostęp do HBase z poziomu jupyter notebook.
+* `visualization\` - folder zawierający notatnik Jupyter notebook z wizualizacjami.
