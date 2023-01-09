@@ -8,3 +8,4 @@ Projekt skupia się na przetwarzaniu i analizie danych dotyczących autobusów w
 * `spark_analysis\` - folder zawierający skrypty z dalszymi analizami w PySpark.
 * `hbase\` - folder zawierający skrypty tworzące bazy danych HBase, jak i również umożliwiające dostęp do HBase z poziomu jupyter notebook.
 * `visualization\` - folder zawierający notatnik Jupyter notebook z wizualizacjami.
+* `raport\` - folder zawierający dokumentację oraz prezentację projektu.
