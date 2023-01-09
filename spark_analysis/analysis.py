@@ -41,7 +41,7 @@ VEH_STATS_PREFIXES = {
     "brigade": "id",
     "totaldist_km": "stats",
     "totaltime_h": "stats",
-    "avgspeed_mps": "stats"
+    "avgspeed_kmph": "stats"
 }
 
 LINE_STATS_PREFIXES = {
@@ -51,7 +51,7 @@ LINE_STATS_PREFIXES = {
     "lines": "id",
     "totaldistline_km": "stats",
     "totaltimeline_h": "stats",
-    "avgspeedline_mps": "stats"
+    "avgspeedline_kmph": "stats"
 }
 
 VEH_WEATHER_STATS_PREFIXES = {
@@ -64,7 +64,20 @@ VEH_WEATHER_STATS_PREFIXES = {
     "coco": "id",
     "totaldist_km": "stats",
     "totaltime_h": "stats",
-    "avgspeed_mps": "stats"
+    "avgspeed_kmph": "stats"
+}
+
+VEH_WIND_STATS_PREFIXES = {
+    "analysisdate" : "meta",
+    "busdatasource": "meta",
+    "date": "id",
+    "lines": "id",
+    "vehiclenumber": "id",
+    "brigade": "id",
+    "wind": "id",
+    "totaldist_km": "stats",
+    "totaltime_h": "stats",
+    "avgspeed_kmph": "stats"
 }
 
 LINE_RAIN_STATS_PREFIXES = {
@@ -77,7 +90,7 @@ LINE_RAIN_STATS_PREFIXES = {
     "avgdistline_km": "stats",
     "totaltimeline_h": "stats",
     "avgtimeline_h": "stats",
-    "avgspeedline_mps": "stats"
+    "avgspeedline_kmph": "stats"
 }
 
 
@@ -174,7 +187,7 @@ def main(date_to_process):
     write_df_to_hbase(veh_stats_dict, "veh_stats", veh_stats_rowkey, VEH_STATS_PREFIXES)
 
     veh_stats.createOrReplaceTempView("VehStats_sql")
-    line_stats = spark.sql("SELECT Lines, SUM(TotalDist_km) AS TotalDistLine_km, SUM(TotalTime_h) AS TotalTimeLine_h, AVG(NULLIF(AvgSpeed_kmph,0)) AS AvgSpeedLine_mps FROM VehStats_sql GROUP BY Lines")
+    line_stats = spark.sql("SELECT Lines, SUM(TotalDist_km) AS TotalDistLine_km, SUM(TotalTime_h) AS TotalTimeLine_h, AVG(NULLIF(AvgSpeed_kmph,0)) AS AvgSpeedLine_kmph FROM VehStats_sql GROUP BY Lines")
 
     def line_stats_rowkey(row):
         return "{}_{}".format(
@@ -224,8 +237,23 @@ def main(date_to_process):
 
     bus_weather_rain_stats = spark.sql("SELECT Lines, VehicleNumber, Brigade, Rain, SUM(DeltaDist_m)/1000 AS TotalDist_km, SUM(DeltaTime_s)/3600 AS TotalTime_h, (SUM(DeltaDist_m)/1000)/(SUM(DeltaTime_s)/3600) AS AvgSpeed_kmph FROM BusWeatherRain_sql GROUP BY Lines, VehicleNumber, Brigade, Rain")
 
+    bus_weather_wind_stats = spark.sql("SELECT Lines, VehicleNumber, Brigade, Wind, SUM(DeltaDist_m)/1000 AS TotalDist_km, SUM(DeltaTime_s)/3600 AS TotalTime_h, (SUM(DeltaDist_m)/1000)/(SUM(DeltaTime_s)/3600) AS AvgSpeed_kmph FROM BusWeatherRain_sql GROUP BY Lines, VehicleNumber, Brigade, Wind")
+
+    def bus_weather_wind_stats_rowkey(row):
+        return "{}_{}_{}_{}_{}".format(
+            row["Date"],
+            row["Lines"],
+            row["VehicleNumber"],
+            row["Brigade"],
+            row["Wind"]
+        )
+
+    bus_weather_wind_stats_dict = add_meta(df_to_dict(bus_weather_wind_stats), date_to_process, source_path)
+    write_df_to_hbase(bus_weather_wind_stats_dict, "bus_weather_wind_stats", bus_weather_wind_stats_rowkey, VEH_WIND_STATS_PREFIXES)
+
+
     bus_weather_rain_stats.createOrReplaceTempView("BusWeatherStats_sql")
-    bus_weather_line_stats = spark.sql("SELECT Lines, Rain, SUM(TotalDist_km) AS TotalDistLine_km, AVG(TotalDist_km) AS AvgDistLine_km, AVG(TotalTime_h) AS AvgTimeLine_h, AVG(NULLIF(AvgSpeed_kmph,0)) AS AvgSpeedLine_mps FROM BusWeatherStats_sql GROUP BY Lines, Rain")
+    bus_weather_line_stats = spark.sql("SELECT Lines, Rain, SUM(TotalDist_km) AS TotalDistLine_km, AVG(TotalDist_km) AS AvgDistLine_km, AVG(TotalTime_h) AS AvgTimeLine_h, AVG(NULLIF(AvgSpeed_kmph,0)) AS AvgSpeedLine_kmph FROM BusWeatherStats_sql GROUP BY Lines, Rain")
 
     logger.info("Saving to HBase...")
 
